@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hostel Maintenance & Complaint Management System | 24BCI0280 & 24BCI0006</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Academic Header Banner -->
+  <header class="top-banner">
+    <div class="banner-content">
+      <div class="banner-badge">BCSE302P Database Systems Lab</div>
+      <div class="banner-text">
+        <strong>Vellore Institute of Technology (SCOPE)</strong> &bull; Slot: <strong>L25+L26</strong> &bull; Faculty: <strong>Dr. V. SIVAKUMAR</strong>
+      </div>
+      <div class="student-tags">
+        <span class="tag">Pragya Agarwal (24BCI0280)</span>
+        <span class="tag">Suhani Singh (24BCI0006)</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="logo-icon">&#127970;</div>
+      <div>
+        <h1 class="brand-title">HostelCare 360</h1>
+        <p class="brand-subtitle">Maintenance & Complaint Management System</p>
+      </div>
+    </div>
+
+    <!-- Quick Role Switcher for Demo / Evaluation -->
+    <div class="demo-auth-bar" id="demoAuthBar">
+      <span class="demo-label">Quick Switch User:</span>
+      <button class="pill-btn student-pill" onclick="quickLogin('suhani')">
+        &#127891; Student (Suhani 24BCI0006)
+      </button>
+      <button class="pill-btn warden-pill" onclick="quickLogin('pragya')">
+        &#128737; Warden (Pragya 24BCI0280)
+      </button>
+      <button class="pill-btn tech-pill" onclick="quickLogin('technician')">
+        &#128295; Technician (Ramesh TECH001)
+      </button>
+    </div>
+
+    <!-- User Profile or Login Trigger -->
+    <div class="nav-user" id="navUserSection">
+      <!-- Populated dynamically by JS -->
+    </div>
+  </nav>
+
+  <!-- Main Content Container -->
+  <main class="container">
+    
+    <!-- Login Modal Section (if logged out) -->
+    <section id="authSection" class="auth-card-overlay hidden">
+      <div class="auth-card">
+        <div class="auth-header">
+          <h2>Sign In to HostelCare</h2>
+          <p>Access your complaints, assignments, and room management portal</p>
+        </div>
+        <form id="loginForm" onsubmit="handleFormLogin(event)">
+          <div class="form-group">
+            <label for="loginIdentifier">Email or Reg No</label>
+            <input type="text" id="loginIdentifier" placeholder="e.g. 24BCI0280 or 24BCI0006" required />
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter password (default: Password@123)" required />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+        </form>
+        <div class="auth-hint">
+          <p><strong>Default test account password:</strong> <code>Password@123</code></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- App Dashboard (Visible when logged in) -->
+    <section id="dashboardSection">
+      
+      <!-- KPI Metric Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon icon-total">&#128221;</div>
+          <div class="kpi-info">
+            <div class="kpi-label">Total Complaints</div>
+            <div class="kpi-value" id="kpiTotalComplaints">0</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon icon-pending">&#9203;</div>
+          <div class="kpi-info">
+            <div class="kpi-label">Pending / Unassigned</div>
+            <div class="kpi-value" id="kpiPendingComplaints">0</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon icon-progress">&#9881;</div>
+          <div class="kpi-info">
+            <div class="kpi-label">In Progress</div>
+            <div class="kpi-value" id="kpiInProgressComplaints">0</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon icon-resolved">&#9989;</div>
+          <div class="kpi-info">
+            <div class="kpi-label">Resolved Issues</div>
+            <div class="kpi-value" id="kpiResolvedComplaints">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs (Complaints / Database Views / Data Dictionary) -->
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('complaintsTab')">&#128203; Complaints Register</button>
+        <button class="tab-btn" onclick="switchTab('viewsTab')">&#128202; Database Views & SLA</button>
+        <button class="tab-btn" onclick="switchTab('dbDetailsTab')">&#128190; DBMS Design & Specs</button>
+      </div>
+
+      <!-- TAB 1: COMPLAINTS REGISTER -->
+      <div id="complaintsTab" class="tab-content active">
+        <!-- Controls: Search, Filters & Action Button -->
+        <div class="toolbar-card">
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search ticket # or complaint title..." oninput="debounceSearch()" />
+          </div>
+
+          <div class="filter-controls">
+            <select id="filterStatus" onchange="loadComplaints(1)">
+              <option value="">All Statuses</option>
+              <option value="SUBMITTED">SUBMITTED</option>
+              <option value="ASSIGNED">ASSIGNED</option>
+              <option value="IN_PROGRESS">IN_PROGRESS</option>
+              <option value="RESOLVED">RESOLVED</option>
+              <option value="CLOSED">CLOSED</option>
+            </select>
+
+            <select id="filterPriority" onchange="loadComplaints(1)">
+              <option value="">All Priorities</option>
+              <option value="EMERGENCY">EMERGENCY</option>
+              <option value="HIGH">HIGH</option>
+              <option value="MEDIUM">MEDIUM</option>
+              <option value="LOW">LOW</option>
+            </select>
+
+            <select id="filterCategory" onchange="loadComplaints(1)">
+              <option value="">All Categories</option>
+            </select>
+          </div>
+
+          <div class="action-box">
+            <button class="btn btn-primary" id="btnNewComplaint" onclick="openNewComplaintModal()">
+              &#43; Lodge Complaint
+            </button>
+          </div>
+        </div>
+
+        <!-- Complaints Table Container -->
+        <div class="table-card">
+          <div class="table-responsive">
+            <table class="data-table" id="complaintsTable">
+              <thead>
+                <tr>
+                  <th>Ticket #</th>
+                  <th>Student & Room</th>
+                  <th>Category & Issue</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Technician</th>
+                  <th>Reported</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="complaintsTableBody">
+                <tr><td colspan="8" class="text-center py-4">Loading complaints...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Bar -->
+          <div class="pagination-bar" id="paginationBar">
+            <button class="btn btn-sm btn-outline" id="prevPageBtn" onclick="changePage(-1)">Previous</button>
+            <span class="page-info" id="pageInfo">Page 1 of 1</span>
+            <button class="btn btn-sm btn-outline" id="nextPageBtn" onclick="changePage(1)">Next</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: DATABASE VIEWS & ANALYTICS -->
+      <div id="viewsTab" class="tab-content">
+        <div class="views-grid">
+          <!-- View 1: Active Complaints & SLA Status -->
+          <div class="view-panel">
+            <div class="panel-header">
+              <h3>View 1: Active Complaints &amp; SLA Tracking</h3>
+              <span class="badge badge-purple">view_active_complaints_summary</span>
+            </div>
+            <p class="panel-desc">Calculates real-time hours elapsed and flags SLA breaches.</p>
+            <div class="table-responsive small-table">
+              <table class="data-table" id="view1Table">
+                <thead>
+                  <tr>
+                    <th>Ticket</th>
+                    <th>Room</th>
+                    <th>Category</th>
+                    <th>Hours Elapsed</th>
+                    <th>SLA Status</th>
+                    <th>Technician</th>
+                  </tr>
+                </thead>
+                <tbody id="view1TableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- View 2: Technician Workload Metrics -->
+          <div class="view-panel">
+            <div class="panel-header">
+              <h3>View 2: Technician Workload &amp; Feedback</h3>
+              <span class="badge badge-purple">view_technician_workload_metrics</span>
+            </div>
+            <p class="panel-desc">Calculates aggregate workload, completed count, and student rating.</p>
+            <div class="table-responsive small-table">
+              <table class="data-table" id="view2Table">
+                <thead>
+                  <tr>
+                    <th>Technician</th>
+                    <th>Contact</th>
+                    <th>Active Tasks</th>
+                    <th>Completed</th>
+                    <th>Avg Rating</th>
+                    <th>Parts Handled</th>
+                  </tr>
+                </thead>
+                <tbody id="view2TableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- View 3: Block-wise Resolution Analytics -->
+          <div class="view-panel full-width">
+            <div class="panel-header">
+              <h3>View 3: Block-wise Maintenance Performance</h3>
+              <span class="badge badge-purple">view_blockwise_resolution_analytics</span>
+            </div>
+            <p class="panel-desc">Summarizes maintenance volume, average resolution time, and rating by hostel block.</p>
+            <div class="table-responsive small-table">
+              <table class="data-table" id="view3Table">
+                <thead>
+                  <tr>
+                    <th>Block</th>
+                    <th>Category</th>
+                    <th>Total Reported</th>
+                    <th>Resolved</th>
+                    <th>Pending</th>
+                    <th>Avg Resolution (Hrs)</th>
+                    <th>Avg Rating</th>
+                  </tr>
+                </thead>
+                <tbody id="view3TableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: DBMS SPECIFICATION & COMPLIANCE -->
+      <div id="dbDetailsTab" class="tab-content">
+        <div class="specs-card">
+          <h2>Project Compliance &amp; Database Architecture</h2>
+          <div class="specs-grid">
+            <div class="spec-box">
+              <h4>Mandatory Schema Compliance</h4>
+              <ul>
+                <li><strong>Single Users Table:</strong> Role-based permissions (STUDENT, WARDEN_ADMIN, TECHNICIAN)</li>
+                <li><strong>Tables:</strong> 10 Normalized 3NF tables with Primary Keys &amp; Foreign Keys</li>
+                <li><strong>Constraints:</strong> CHECK constraints, UNIQUE indices, DEFAULT clauses</li>
+                <li><strong>Password Security:</strong> BCrypt salted hash (10 rounds)</li>
+              </ul>
+            </div>
+            <div class="spec-box">
+              <h4>Advanced Database Routines</h4>
+              <ul>
+                <li><strong>Stored Procedure 1:</strong> <code>sp_pragya24bci0280_assign_technician</code> (ACID Transaction)</li>
+                <li><strong>Stored Procedure 2:</strong> <code>sp_suhani24bci0006_resolve_complaint_with_worklog</code></li>
+                <li><strong>Trigger 1:</strong> <code>trg_before_complaint_insert_prevent_duplicate</code></li>
+                <li><strong>Trigger 2:</strong> <code>trg_after_complaint_status_update</code> (Auto audit logging)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- MODAL: Lodge New Complaint -->
+  <div id="newComplaintModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Lodge Maintenance Complaint</h3>
+        <button class="modal-close" onclick="closeModal('newComplaintModal')">&times;</button>
+      </div>
+      <form id="newComplaintForm" onsubmit="handleCreateComplaint(event)">
+        <div class="form-group">
+          <label for="complaintCategory">Category *</label>
+          <select id="complaintCategory" required></select>
+        </div>
+        <div class="form-group">
+          <label for="complaintRoom">Room Number *</label>
+          <select id="complaintRoom" required></select>
+        </div>
+        <div class="form-group">
+          <label for="complaintPriority">Priority Level *</label>
+          <select id="complaintPriority" required>
+            <option value="LOW">LOW</option>
+            <option value="MEDIUM" selected>MEDIUM</option>
+            <option value="HIGH">HIGH</option>
+            <option value="EMERGENCY">EMERGENCY (Triggers Under Maintenance Status)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="complaintTitle">Complaint Title *</label>
+          <input type="text" id="complaintTitle" placeholder="e.g. Faucet dripping continuously" required />
+        </div>
+        <div class="form-group">
+          <label for="complaintDescription">Detailed Issue Description *</label>
+          <textarea id="complaintDescription" rows="3" placeholder="Provide details regarding the issue..." required></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('newComplaintModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Ticket</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Assign Technician (Warden Admin) -->
+  <div id="assignTechnicianModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Assign Technician (ACID Stored Procedure)</h3>
+        <button class="modal-close" onclick="closeModal('assignTechnicianModal')">&times;</button>
+      </div>
+      <form id="assignTechnicianForm" onsubmit="handleAssignTechnician(event)">
+        <input type="hidden" id="assignComplaintId" />
+        <div class="form-group">
+          <label>Selected Ticket</label>
+          <input type="text" id="assignTicketNo" disabled class="input-disabled" />
+        </div>
+        <div class="form-group">
+          <label for="assignTechSelect">Technician *</label>
+          <select id="assignTechSelect" required></select>
+        </div>
+        <div class="form-group">
+          <label for="assignExpectedHours">Expected SLA Hours</label>
+          <input type="number" id="assignExpectedHours" value="24" min="1" max="168" required />
+        </div>
+        <div class="form-group">
+          <label for="assignNotes">Instructions for Technician</label>
+          <textarea id="assignNotes" rows="2" placeholder="e.g. Inspect relay and replace switch box..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('assignTechnicianModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Execute sp_pragya24bci0280_assign_technician</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Resolve Complaint & Log Work (Technician) -->
+  <div id="resolveComplaintModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Complete Maintenance &amp; Work Log</h3>
+        <button class="modal-close" onclick="closeModal('resolveComplaintModal')">&times;</button>
+      </div>
+      <form id="resolveComplaintForm" onsubmit="handleResolveComplaint(event)">
+        <input type="hidden" id="resolveAssignmentId" />
+        <div class="form-group">
+          <label for="resolveActionTaken">Action Taken *</label>
+          <textarea id="resolveActionTaken" rows="2" placeholder="e.g. Replaced 16A modular switch and tightened terminals" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="resolvePartsReplaced">Parts Replaced (if any)</label>
+          <input type="text" id="resolvePartsReplaced" placeholder="e.g. Crabtree 16A Switch" />
+        </div>
+        <div class="form-group">
+          <label for="resolveCost">Cost Incurred (₹)</label>
+          <input type="number" id="resolveCost" value="0.00" step="0.50" min="0" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('resolveComplaintModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Execute sp_suhani24bci0006_resolve_complaint</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Student Feedback -->
+  <div id="feedbackModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Rate Maintenance Service</h3>
+        <button class="modal-close" onclick="closeModal('feedbackModal')">&times;</button>
+      </div>
+      <form id="feedbackForm" onsubmit="handleFeedbackSubmit(event)">
+        <input type="hidden" id="feedbackComplaintId" />
+        <div class="form-group">
+          <label for="feedbackRating">Rating (1 to 5 Stars) *</label>
+          <select id="feedbackRating" required>
+            <option value="5">⭐⭐⭐⭐⭐ 5 Stars - Excellent Service</option>
+            <option value="4">⭐⭐⭐⭐ 4 Stars - Good Resolution</option>
+            <option value="3">⭐⭐⭐ 3 Stars - Average</option>
+            <option value="2">⭐⭐ 2 Stars - Subpar</option>
+            <option value="1">⭐ 1 Star - Unsatisfactory</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="feedbackComments">Feedback Remarks</label>
+          <textarea id="feedbackComments" rows="3" placeholder="How was the resolution quality?"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('feedbackModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Feedback</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Global Toast / Alert -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

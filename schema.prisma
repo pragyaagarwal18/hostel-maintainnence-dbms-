@@ -1,0 +1,245 @@
+// Prisma Schema for Hostel Maintenance & Complaint Management System
+// Authors: Pragya Agarwal (24BCI0280) & Suhani Singh (24BCI0006)
+// Course: BCSE302P Database Systems Lab | Slot: L25+L26
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  WARDEN_ADMIN
+  TECHNICIAN
+}
+
+enum RoomStatus {
+  AVAILABLE
+  OCCUPIED
+  UNDER_MAINTENANCE
+}
+
+enum ComplaintPriority {
+  LOW
+  MEDIUM
+  HIGH
+  EMERGENCY
+}
+
+enum ComplaintStatus {
+  SUBMITTED
+  ASSIGNED
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+  REJECTED
+}
+
+enum AllocationStatus {
+  ACTIVE
+  TRANSFERRED
+  VACATED
+}
+
+enum AssignmentStatus {
+  ACTIVE
+  COMPLETED
+  REASSIGNED
+}
+
+// 1. Single Users Table (MANDATORY REQUIREMENT: No separate tables for Admin/Student/Technician)
+model User {
+  id            Int      @id @default(autoincrement()) @map("user_id")
+  regNo         String   @unique @map("reg_no") @db.VarChar(50)
+  fullName      String   @map("full_name") @db.VarChar(100)
+  email         String   @unique @db.VarChar(120)
+  passwordHash  String   @map("password_hash") @db.VarChar(255)
+  role          Role     @default(STUDENT)
+  phoneNumber   String?  @map("phone_number") @db.VarChar(20)
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  managedBlocks           HostelBlock[]            @relation("WardenHostelBlocks")
+  studentAllocations      StudentAllocation[]      @relation("StudentAllocations")
+  lodgedComplaints        Complaint[]              @relation("StudentComplaints")
+  technicianAssignments   MaintenanceAssignment[]  @relation("TechnicianAssignments")
+  supervisedAssignments   MaintenanceAssignment[]  @relation("WardenAssignments")
+  maintenanceWorkLogs     MaintenanceWorkLog[]     @relation("TechnicianWorkLogs")
+  feedbackGiven           ComplaintFeedback[]      @relation("StudentFeedback")
+  auditActions            AuditLog[]               @relation("UserAuditLogs")
+
+  @@index([role], name: "idx_users_role")
+  @@index([email], name: "idx_users_email")
+  @@map("users")
+}
+
+// 2. Hostel Blocks Table
+model HostelBlock {
+  id          Int      @id @default(autoincrement()) @map("block_id")
+  blockName   String   @unique @map("block_name") @db.VarChar(50)
+  genderType  String   @map("gender_type") @db.VarChar(10) // MALE, FEMALE
+  totalFloors Int      @default(5) @map("total_floors")
+  wardenId    Int?     @map("warden_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  warden      User?    @relation("WardenHostelBlocks", fields: [wardenId], references: [id], onDelete: SetNull)
+  rooms       Room[]
+
+  @@map("hostel_blocks")
+}
+
+// 3. Rooms Table
+model Room {
+  id              Int         @id @default(autoincrement()) @map("room_id")
+  blockId         Int         @map("block_id")
+  roomNumber      String      @map("room_number") @db.VarChar(20)
+  floorNo         Int         @map("floor_no")
+  capacity        Int         @default(2)
+  currentOccupancy Int        @default(0) @map("current_occupancy")
+  roomType        String      @default("AC") @map("room_type") @db.VarChar(20)
+  status          RoomStatus  @default(AVAILABLE)
+
+  block           HostelBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  allocations     StudentAllocation[]
+  complaints      Complaint[]
+
+  @@unique([blockId, roomNumber], name: "unique_block_room")
+  @@index([blockId], name: "idx_rooms_block_id")
+  @@index([status], name: "idx_rooms_status")
+  @@map("rooms")
+}
+
+// 4. Student Allocations Table
+model StudentAllocation {
+  id               Int              @id @default(autoincrement()) @map("allocation_id")
+  studentId        Int              @map("student_id")
+  roomId           Int              @map("room_id")
+  academicYear     String           @map("academic_year") @db.VarChar(20)
+  checkInDate      DateTime         @default(now()) @map("check_in_date")
+  checkOutDate     DateTime?        @map("check_out_date")
+  status           AllocationStatus @default(ACTIVE)
+
+  student          User             @relation("StudentAllocations", fields: [studentId], references: [id], onDelete: Cascade)
+  room             Room             @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([studentId], name: "idx_alloc_student")
+  @@index([roomId], name: "idx_alloc_room")
+  @@map("student_allocations")
+}
+
+// 5. Complaint Categories Table
+model ComplaintCategory {
+  id                 Int         @id @default(autoincrement()) @map("category_id")
+  categoryName       String      @unique @map("category_name") @db.VarChar(50)
+  slaResolutionHours Int         @default(24) @map("sla_resolution_hours")
+  priorityDefault    ComplaintPriority @default(MEDIUM) @map("priority_default")
+  description        String?     @db.Text
+
+  complaints         Complaint[]
+
+  @@map("complaint_categories")
+}
+
+// 6. Complaints Table
+model Complaint {
+  id             Int               @id @default(autoincrement()) @map("complaint_id")
+  ticketNumber   String            @unique @map("ticket_number") @db.VarChar(50)
+  studentId      Int               @map("student_id")
+  roomId         Int               @map("room_id")
+  categoryId     Int               @map("category_id")
+  title          String            @db.VarChar(150)
+  description    String            @db.Text
+  priority       ComplaintPriority @default(MEDIUM)
+  status         ComplaintStatus   @default(SUBMITTED)
+  createdAt      DateTime          @default(now()) @map("created_at")
+  resolvedAt     DateTime?         @map("resolved_at")
+
+  student        User              @relation("StudentComplaints", fields: [studentId], references: [id], onDelete: Cascade)
+  room           Room              @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  category       ComplaintCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  assignments    MaintenanceAssignment[]
+  feedback       ComplaintFeedback?
+
+  @@index([studentId], name: "idx_complaint_student")
+  @@index([roomId], name: "idx_complaint_room")
+  @@index([categoryId], name: "idx_complaint_category")
+  @@index([status], name: "idx_complaint_status")
+  @@index([createdAt], name: "idx_complaint_created_at")
+  @@map("complaints")
+}
+
+// 7. Maintenance Assignments Table
+model MaintenanceAssignment {
+  id                 Int              @id @default(autoincrement()) @map("assignment_id")
+  complaintId        Int              @map("complaint_id")
+  technicianId       Int              @map("technician_id")
+  assignedBy         Int              @map("assigned_by")
+  assignedAt         DateTime         @default(now()) @map("assigned_at")
+  expectedCompletion DateTime?        @map("expected_completion")
+  workNotes          String?          @map("work_notes") @db.Text
+  assignmentStatus   AssignmentStatus @default(ACTIVE) @map("assignment_status")
+
+  complaint          Complaint        @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  technician         User             @relation("TechnicianAssignments", fields: [technicianId], references: [id], onDelete: Cascade)
+  assigner           User             @relation("WardenAssignments", fields: [assignedBy], references: [id], onDelete: Cascade)
+  workLogs           MaintenanceWorkLog[]
+
+  @@index([complaintId], name: "idx_assign_complaint")
+  @@index([technicianId], name: "idx_assign_technician")
+  @@map("maintenance_assignments")
+}
+
+// 8. Maintenance Work Logs Table
+model MaintenanceWorkLog {
+  id            Int                   @id @default(autoincrement()) @map("log_id")
+  assignmentId  Int                   @map("assignment_id")
+  technicianId  Int                   @map("technician_id")
+  actionTaken   String                @map("action_taken") @db.Text
+  partsReplaced String?               @map("parts_replaced") @db.VarChar(255)
+  costIncurred  Decimal               @default(0.00) @map("cost_incurred") @db.Decimal(10, 2)
+  loggedAt      DateTime              @default(now()) @map("logged_at")
+
+  assignment    MaintenanceAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  technician    User                  @relation("TechnicianWorkLogs", fields: [technicianId], references: [id], onDelete: Cascade)
+
+  @@index([assignmentId], name: "idx_worklog_assignment")
+  @@map("maintenance_work_logs")
+}
+
+// 9. Complaint Feedback Table
+model ComplaintFeedback {
+  id               Int       @id @default(autoincrement()) @map("feedback_id")
+  complaintId      Int       @unique @map("complaint_id")
+  studentId        Int       @map("student_id")
+  rating           Int       @map("rating") // 1 to 5 Stars
+  feedbackComments String?   @map("feedback_comments") @db.Text
+  submittedAt      DateTime  @default(now()) @map("submitted_at")
+
+  complaint        Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  student          User      @relation("StudentFeedback", fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("complaint_feedback")
+}
+
+// 10. Audit Logs Table (For security, compliance & trigger history)
+model AuditLog {
+  id           Int      @id @default(autoincrement()) @map("log_id")
+  entityName   String   @map("entity_name") @db.VarChar(50)
+  entityId     Int      @map("entity_id")
+  actionType   String   @map("action_type") @db.VarChar(20) // INSERT, UPDATE, DELETE
+  performedBy  Int?     @map("performed_by")
+  oldState     String?  @map("old_state") @db.Text
+  newState     String?  @map("new_state") @db.Text
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  actor        User?    @relation("UserAuditLogs", fields: [performedBy], references: [id], onDelete: SetNull)
+
+  @@index([entityName, entityId], name: "idx_audit_entity")
+  @@map("audit_logs")
+}
