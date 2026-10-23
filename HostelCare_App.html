@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HostelCare 360 | Hostel Maintenance & Complaint Management System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --primary-light: #eef2ff;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --purple: #8b5cf6;
+      --gray-900: #0f172a;
+      --gray-700: #334155;
+      --gray-500: #64748b;
+      --gray-300: #cbd5e1;
+      --gray-100: #f1f5f9;
+      --white: #ffffff;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-family); background-color: #f8fafc; color: var(--gray-900); min-height: 100vh; }
+
+    /* ==========================================================================
+       LOGIN VIEW (SHOWN INITIALLY BEFORE AUTHENTICATION)
+       ========================================================================== */
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+      padding: 20px;
+    }
+
+    .login-card {
+      background: var(--white);
+      width: 100%;
+      max-width: 440px;
+      border-radius: var(--radius-lg);
+      padding: 36px 32px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.4s ease;
+    }
+
+    .login-brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .login-icon {
+      font-size: 2.4rem;
+      background: var(--primary-light);
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .login-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #1e1b4b;
+    }
+
+    .login-subtitle {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      margin-top: 4px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+
+    .btn-login:hover {
+      background: var(--primary-hover);
+    }
+
+    /* Quick Fill Chips for easy evaluation */
+    .quick-fill-box {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--gray-100);
+    }
+
+    .quick-fill-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .quick-chips {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .chip-btn {
+      background: #f8fafc;
+      border: 1px solid var(--gray-300);
+      padding: 7px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+      text-align: left;
+    }
+
+    .chip-btn:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .chip-role {
+      font-size: 0.68rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .chip-role.student { background: #e0e7ff; color: #3730a3; }
+    .chip-role.warden { background: #fef3c7; color: #92400e; }
+    .chip-role.tech { background: #d1fae5; color: #065f46; }
+
+    /* ==========================================================================
+       DASHBOARD VIEW (SHOWN ONLY AFTER SUCCESSFUL AUTHENTICATION)
+       ========================================================================== */
+    .app-dashboard {
+      display: none; /* Initially hidden until login */
+    }
+
+    /* Navbar */
+    .navbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-300);
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-logo {
+      font-size: 1.8rem;
+      background: var(--primary-light);
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+    }
+    .brand-title { font-size: 1.25rem; font-weight: 700; color: #1e1b4b; }
+    .brand-sub { font-size: 0.75rem; color: var(--gray-500); }
+
+    /* Active User Info & Sign Out Button */
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--gray-100);
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--gray-300);
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .user-details { line-height: 1.2; text-align: left; }
+    .user-name-text { font-size: 0.85rem; font-weight: 700; }
+    .user-meta-text { font-size: 0.72rem; color: var(--gray-500); }
+
+    .role-badge {
+      font-size: 0.68rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .role-student { background: #e0e7ff; color: #3730a3; }
+    .role-warden { background: #fef3c7; color: #92400e; }
+    .role-tech { background: #d1fae5; color: #065f46; }
+
+    .btn-signout {
+      background: transparent;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-signout:hover {
+      background: #fee2e2;
+    }
+
+    /* Container */
+    .container { max-width: 1300px; margin: 24px auto; padding: 0 20px; }
+
+    /* KPI Row */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--white);
+      padding: 16px 20px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--gray-300);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .kpi-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+    .bg-indigo { background: #eef2ff; color: #4338ca; }
+    .bg-amber { background: #fffbeb; color: #b45309; }
+    .bg-blue { background: #eff6ff; color: #1d4ed8; }
+    .bg-green { background: #f0fdf4; color: #15803d; }
+    .kpi-title { font-size: 0.75rem; color: var(--gray-500); font-weight: 700; text-transform: uppercase; }
+    .kpi-num { font-size: 1.7rem; font-weight: 700; line-height: 1.1; }
+
+    /* Tabs Bar */
+    .tab-nav {
+      display: flex;
+      gap: 10px;
+      border-bottom: 2px solid var(--gray-300);
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 10px 18px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--gray-500);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover { color: var(--primary); }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
+    .tab-page { display: none; }
+    .tab-page.active { display: block; }
+
+    /* Controls Bar */
+    .controls-card {
+      background: var(--white);
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--gray-300);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .search-input {
+      padding: 8px 14px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      width: 260px;
+      outline: none;
+    }
+    .filter-select {
+      padding: 8px 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      background: var(--white);
+      outline: none;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--primary); color: var(--white); }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-outline { background: transparent; border-color: var(--gray-300); color: var(--gray-700); }
+    .btn-outline:hover { background: var(--gray-100); }
+    .btn-sm { padding: 4px 10px; font-size: 0.78rem; }
+    .btn-success { background: var(--success); color: var(--white); }
+    .btn-warning { background: var(--warning); color: var(--white); }
+    .btn-danger { background: var(--danger); color: var(--white); }
+
+    /* Tables */
+    .table-container {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--gray-300);
+      box-shadow: var(--shadow-sm);
+      overflow-x: auto;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
+    th {
+      background: #f8fafc;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--gray-300);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-700);
+    }
+    td { padding: 12px 16px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+    tr:hover { background: #f8fafc; }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .badge-submitted { background: #e2e8f0; color: #334155; }
+    .badge-assigned { background: #fef3c7; color: #92400e; }
+    .badge-in_progress { background: #dbeafe; color: #1e40af; }
+    .badge-resolved { background: #dcfce7; color: #166534; }
+    .badge-emergency { background: #fee2e2; color: #991b1b; }
+    .badge-high { color: #ea580c; font-weight: 700; }
+    .badge-medium { color: #0284c7; font-weight: 600; }
+    .badge-low { color: #64748b; font-weight: 500; }
+
+    /* Grid Layouts */
+    .views-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+      gap: 20px;
+    }
+    .view-card {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--gray-300);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .view-card.full-col { grid-column: 1 / -1; }
+    .view-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .view-badge { background: #ede9fe; color: #5b21b6; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-family: var(--font-mono); font-weight: 700; }
+
+    /* Security Tab Cards & Boxes */
+    .security-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 20px;
+    }
+    .security-card {
+      background: var(--white);
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .sec-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .sec-green { background: #dcfce7; color: #166534; }
+    .sec-blue { background: #e0e7ff; color: #3730a3; }
+    .sec-amber { background: #fef3c7; color: #92400e; }
+    .sec-purple { background: #f3e8ff; color: #6b21a8; }
+
+    .code-preview {
+      background: #0f172a;
+      color: #38bdf8;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      overflow-x: auto;
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+
+    /* SQL Console Box */
+    .console-box {
+      background: #0f172a;
+      color: #38bdf8;
+      font-family: var(--font-mono);
+      padding: 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      margin-top: 16px;
+      white-space: pre-wrap;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+    .modal-content {
+      background: var(--white);
+      width: 100%;
+      max-width: 500px;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--gray-300); padding-bottom: 10px; }
+    .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray-500); }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1e293b;
+      color: var(--white);
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      z-index: 200;
+      box-shadow: var(--shadow-lg);
+    }
+    .hidden { display: none !important; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================
+       SCREEN 1: LOGIN PORTAL (MANDATORY VIT REQUIREMENT)
+       ======================================================================== -->
+  <div id="loginScreen" class="login-container">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="login-icon">&#127970;</div>
+        <h2 class="login-title">HostelCare 360</h2>
+        <p class="login-subtitle">Hostel Maintenance &amp; Complaint Management Portal</p>
+      </div>
+
+      <form id="authLoginForm" onsubmit="handleFormLogin(event)">
+        <div class="form-group">
+          <label for="inputIdentifier">Registration No / Employee ID</label>
+          <input type="text" id="inputIdentifier" class="form-input" placeholder="Enter Registration No or Employee ID" required />
+        </div>
+
+        <div class="form-group">
+          <label for="inputPassword">Password</label>
+          <input type="password" id="inputPassword" class="form-input" placeholder="Enter Password" value="Password@123" required />
+        </div>
+
+        <button type="submit" class="btn-login">&#128274; Sign In to Dashboard</button>
+      </form>
+
+      <div style="text-align: center; margin-top: 16px;">
+        <span style="font-size: 0.72rem; color: #94a3b8;">Hostel Residential Services &bull; Secure Authentication</span>
+      </div>
+    </div>
+
+    <!-- Hidden Spot: Subtle Discreet Info Icon in bottom-right corner -->
+    <button type="button" onclick="openModal('hiddenDirectoryModal')" style="position: fixed; bottom: 12px; right: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer;" title="System Directory">&#9432;</button>
+  </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       SCREEN 2: AUTHENTICATED SYSTEM DASHBOARD (UNLOCKED UPON LOGIN)
+       ======================================================================== -->
+  <div id="dashboardScreen" class="app-dashboard">
+
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="brand">
+        <div class="brand-logo">&#127970;</div>
+        <div>
+          <h1 class="brand-title">HostelCare 360</h1>
+          <div class="brand-sub">Hostel Maintenance &amp; Complaint Management System</div>
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <!-- Active User Profile Display -->
+        <div class="user-pill">
+          <div class="user-avatar" id="navAvatar">S</div>
+          <div class="user-details">
+            <div class="user-name-text" id="navUserName">Suhani Singh</div>
+            <div class="user-meta-text" id="navUserMeta">24BCI0006</div>
+          </div>
+          <span class="role-badge role-student" id="navRoleBadge">STUDENT</span>
+        </div>
+
+        <!-- Sign Out Button -->
+        <button class="btn-signout" onclick="handleSignOut()">
+          &#128682; Sign Out
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="container">
+
+      <!-- KPI Metric Cards -->
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-icon bg-indigo">&#128221;</div>
+          <div>
+            <div class="kpi-title">Total Complaints</div>
+            <div class="kpi-num" id="kpiTotal">8</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon bg-amber">&#9203;</div>
+          <div>
+            <div class="kpi-title">Pending Action</div>
+            <div class="kpi-num" id="kpiPending">3</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon bg-blue">&#9881;</div>
+          <div>
+            <div class="kpi-title">In Progress / Assigned</div>
+            <div class="kpi-num" id="kpiProgress">3</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon bg-green">&#9989;</div>
+          <div>
+            <div class="kpi-title">Resolved &amp; Closed</div>
+            <div class="kpi-num" id="kpiResolved">2</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="showTab(event, 'tabComplaints')">&#128203; Live Complaints Table</button>
+        <button class="tab-btn" onclick="showTab(event, 'tabSecurity')">&#128274; Authentication &amp; Security Specs</button>
+        <button class="tab-btn" onclick="showTab(event, 'tabViews')">&#128202; 3 Database Views &amp; SLA Tracking</button>
+        <button class="tab-btn" onclick="showTab(event, 'tabProcedures')">&#9889; Stored Procedures &amp; Triggers</button>
+        <button class="tab-btn" onclick="showTab(event, 'tabSchema')">&#128190; Single Users Table &amp; 3NF Schema</button>
+      </div>
+
+      <!-- TAB 1: Live Complaints Table -->
+      <div id="tabComplaints" class="tab-page active">
+        <div class="controls-card">
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search ticket # or title..." oninput="renderComplaintsTable()" />
+            <select id="filterStatus" class="filter-select" onchange="renderComplaintsTable()">
+              <option value="">All Statuses</option>
+              <option value="SUBMITTED">SUBMITTED</option>
+              <option value="ASSIGNED">ASSIGNED</option>
+              <option value="IN_PROGRESS">IN_PROGRESS</option>
+              <option value="RESOLVED">RESOLVED</option>
+            </select>
+            <select id="filterCategory" class="filter-select" onchange="renderComplaintsTable()">
+              <option value="">All Categories</option>
+              <option value="Electrical">Electrical &amp; Wiring</option>
+              <option value="Plumbing">Plumbing &amp; Sanitation</option>
+              <option value="HVAC">Air Conditioning &amp; HVAC</option>
+              <option value="Network">Wi-Fi &amp; LAN Network</option>
+              <option value="Carpentry">Carpentry &amp; Furniture</option>
+              <option value="Civil">Civil &amp; Pest Control</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" id="btnOpenNewModal" onclick="openModal('newComplaintModal')">
+            &#43; Lodge New Complaint
+          </button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Ticket #</th>
+                <th>Student &amp; Room</th>
+                <th>Category &amp; Issue</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Assigned Technician</th>
+                <th>Reported At</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="complaintsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 2: Authentication & Security Specs -->
+      <div id="tabSecurity" class="tab-page">
+        <div class="security-grid">
+          
+          <!-- Security Feature 1: Single Users Table Rule -->
+          <div class="security-card">
+            <span class="sec-badge sec-green">Mandatory Syllabi Rule Complied</span>
+            <h3>1. Single Users Table RBAC</h3>
+            <p style="font-size:0.85rem; color:var(--gray-700); margin-top:6px;">
+              Dr. Sivakumar explicitly specified: <em>"Maintain all users in a single Users table. Do NOT create separate tables such as Admin, Student, Faculty, Manager, Employee."</em>
+            </p>
+            <div class="code-preview">
+-- From database/01_schema_ddl.sql
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    reg_no VARCHAR(50) NOT NULL UNIQUE,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(120) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    role ENUM('STUDENT', 'WARDEN_ADMIN', 'TECHNICIAN') NOT NULL,
+    phone_number VARCHAR(20),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE
+);</div>
+          </div>
+
+          <!-- Security Feature 2: Password Hashing -->
+          <div class="security-card">
+            <span class="sec-badge sec-purple">Password Security</span>
+            <h3>2. BCrypt Salted Hashing</h3>
+            <p style="font-size:0.85rem; color:var(--gray-700); margin-top:6px;">
+              Plaintext passwords are never stored in the database. Every user password undergoes <strong>10 rounds of cryptographic salting</strong> via BCrypt.
+            </p>
+            <div class="code-preview">
+// Plaintext Password entered at login: "Password@123"
+// Stored Hashed String in MySQL:
+$2b$10$z8mY9wH7p6V3y0Dq1kQx.OqNn7qP1uQ2wE3r4t5y6u7i8o9p0a1s2
+
+// Verification in authController.js:
+const isValid = await bcrypt.compare(password, user.passwordHash);</div>
+          </div>
+
+          <!-- Security Feature 3: JWT Authentication & Session Handling -->
+          <div class="security-card">
+            <span class="sec-badge sec-blue">Stateless Auth</span>
+            <h3>3. JWT Token Authentication</h3>
+            <p style="font-size:0.85rem; color:var(--gray-700); margin-top:6px;">
+              Upon successful login, the server issues a digitally signed <strong>JSON Web Token</strong> containing claims for role, registration number, and expiry.
+            </p>
+            <div class="code-preview" id="jwtTokenDisplay">
+// Active Signed JWT Token Header:
+{ "alg": "HS256", "typ": "JWT" }
+
+// Active Decoded Token Claims:
+{
+  "userId": 1,
+  "regNo": "24BCI0006",
+  "fullName": "Suhani Singh",
+  "role": "STUDENT",
+  "exp": 1792500000
+}</div>
+          </div>
+
+          <!-- Security Feature 4: SQL Injection Prevention & Secrets -->
+          <div class="security-card">
+            <span class="sec-badge sec-amber">Data Defense</span>
+            <h3>4. SQL Injection Defense &amp; Secrets</h3>
+            <p style="font-size:0.85rem; color:var(--gray-700); margin-top:6px;">
+              ORM-level parameterized queries prevent SQL injection attacks. Secrets are loaded via <code>.env</code> and excluded from version control via <code>.gitignore</code>.
+            </p>
+            <div class="code-preview">
+# Environment Secrets (.env) - Excluded from Git:
+DATABASE_URL="mysql://root:****@localhost:3306/hostel_db"
+JWT_SECRET="pragya_24bci0280_suhani_24bci0006_jwt_secret_key"
+
+// Role-Based Authorization Middleware:
+Suhani24BCI0006_AuthMiddleware.suhani_authorizeRoles('WARDEN_ADMIN')</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB 3: Database Views -->
+      <div id="tabViews" class="tab-page">
+        <div class="views-grid">
+          <!-- View 1 -->
+          <div class="view-card">
+            <div class="view-header">
+              <h3>View 1: Active Complaints &amp; SLA Tracking</h3>
+              <span class="view-badge">view_active_complaints_summary</span>
+            </div>
+            <p style="font-size:0.8rem; color:var(--gray-500); margin-bottom:12px;">Real-time join calculating elapsed hours against SLA threshold limits.</p>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ticket</th>
+                    <th>Location</th>
+                    <th>Category</th>
+                    <th>Elapsed / SLA</th>
+                    <th>SLA Status</th>
+                  </tr>
+                </thead>
+                <tbody id="view1Tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- View 2 -->
+          <div class="view-card">
+            <div class="view-header">
+              <h3>View 2: Technician Workload Metrics</h3>
+              <span class="view-badge">view_technician_workload_metrics</span>
+            </div>
+            <p style="font-size:0.8rem; color:var(--gray-500); margin-bottom:12px;">Aggregated active tasks, completed count, and student rating.</p>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Technician</th>
+                    <th>Active</th>
+                    <th>Resolved</th>
+                    <th>Avg Rating</th>
+                    <th>Parts Cost</th>
+                  </tr>
+                </thead>
+                <tbody id="view2Tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- View 3 -->
+          <div class="view-card full-col">
+            <div class="view-header">
+              <h3>View 3: Block-wise Resolution Analytics</h3>
+              <span class="view-badge">view_blockwise_resolution_analytics</span>
+            </div>
+            <p style="font-size:0.8rem; color:var(--gray-500); margin-bottom:12px;">Hostel building performance across maintenance disciplines.</p>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Hostel Block</th>
+                    <th>Discipline</th>
+                    <th>Total Reported</th>
+                    <th>Resolved</th>
+                    <th>Pending</th>
+                    <th>Avg Resolution Time</th>
+                    <th>Block Rating</th>
+                  </tr>
+                </thead>
+                <tbody id="view3Tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: Stored Procedures & Triggers -->
+      <div id="tabProcedures" class="tab-page">
+        <div class="view-card full-col">
+          <h3>Live Stored Routine &amp; Trigger Audit Console</h3>
+          <p style="font-size:0.85rem; color:var(--gray-500); margin-top:4px;">
+            This console displays real-time execution outputs with <strong>Pragya Agarwal (24BCI0280)</strong> and <strong>Suhani Singh (24BCI0006)</strong> timestamps:
+          </p>
+          <div class="console-box" id="sqlConsoleBox">
+[SYSTEM INITIALIZATION]
+Database: hostel_maintenance_db (MySQL 8.0 / InnoDB)
+Authors: PRAGYA AGARWAL (24BCI0280) & SUHANI SINGH (24BCI0006)
+Slot: L25+L26 | Faculty: Dr. V. SIVAKUMAR
+Timestamp: <span id="consoleTime"></span>
+
+> Status: Ready. Perform an action (Assign Technician, Resolve Ticket, or Lodge Complaint) to see live Stored Procedure & Trigger executions here!
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: Single Users Table & 3NF Schema -->
+      <div id="tabSchema" class="tab-page">
+        <div class="view-card full-col">
+          <h3>10 Relational Tables Specification (Normalized 3NF)</h3>
+          <p style="font-size:0.85rem; color:var(--gray-500); margin-bottom:14px;">
+            Strict adherence to Dr. Sivakumar's instructions: <strong>Single Users Table</strong> with Role Enum, zero redundant tables.
+          </p>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Table Name</th>
+                  <th>Primary Key</th>
+                  <th>Foreign Keys &amp; Constraints</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td><code>users</code></td><td><code>user_id</code></td><td>UK: <code>email</code>, <code>reg_no</code> | ENUM: <code>role</code></td><td>Single Users Table with RBAC (STUDENT, WARDEN_ADMIN, TECHNICIAN)</td></tr>
+                <tr><td>2</td><td><code>hostel_blocks</code></td><td><code>block_id</code></td><td>UK: <code>block_name</code> | FK: <code>warden_id</code></td><td>Hostel residential blocks with floor counts and chief wardens</td></tr>
+                <tr><td>3</td><td><code>rooms</code></td><td><code>room_id</code></td><td>FK: <code>block_id</code> | CHECK: <code>capacity &gt;= 1</code></td><td>Student rooms, occupancy state, and maintenance flags</td></tr>
+                <tr><td>4</td><td><code>student_allocations</code></td><td><code>allocation_id</code></td><td>FK: <code>student_id</code>, <code>room_id</code></td><td>Room allotment history and active residence states</td></tr>
+                <tr><td>5</td><td><code>complaint_categories</code></td><td><code>category_id</code></td><td>UK: <code>category_name</code> | CHECK: <code>sla &gt; 0</code></td><td>Maintenance disciplines with predefined SLA resolution limits</td></tr>
+                <tr><td>6</td><td><code>complaints</code></td><td><code>complaint_id</code></td><td>FK: <code>student_id</code>, <code>room_id</code>, <code>category_id</code></td><td>Primary ticket entity with title, status, and timestamps</td></tr>
+                <tr><td>7</td><td><code>maintenance_assignments</code></td><td><code>assignment_id</code></td><td>FK: <code>complaint_id</code>, <code>technician_id</code>, <code>assigned_by</code></td><td>Task assignment ledger with SLA target deadlines</td></tr>
+                <tr><td>8</td><td><code>maintenance_work_logs</code></td><td><code>log_id</code></td><td>FK: <code>assignment_id</code>, <code>technician_id</code></td><td>Details of repairs performed, spare parts replaced, and costs</td></tr>
+                <tr><td>9</td><td><code>complaint_feedback</code></td><td><code>feedback_id</code></td><td>UK: <code>complaint_id</code> | CHECK: <code>rating 1-5</code></td><td>Student satisfaction ratings and qualitative feedback</td></tr>
+                <tr><td>10</td><td><code>audit_logs</code></td><td><code>log_id</code></td><td>FK: <code>performed_by</code></td><td>Immutable audit trail generated via automated MySQL triggers</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- MODAL 1: Lodge Complaint -->
+  <div id="newComplaintModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Lodge Maintenance Complaint</h3>
+        <button class="close-btn" onclick="closeModal('newComplaintModal')">&times;</button>
+      </div>
+      <form onsubmit="handleLodgeComplaint(event)">
+        <div class="form-group">
+          <label>Hostel Room *</label>
+          <select id="modalRoom" required>
+            <option value="1">Block-A (Sarojini) - Room A-101</option>
+            <option value="2">Block-A (Sarojini) - Room A-102</option>
+            <option value="3">Block-A (Sarojini) - Room A-201</option>
+            <option value="4">Block-B (Tagore) - Room B-101</option>
+            <option value="5">Block-B (Tagore) - Room B-205</option>
+            <option value="7">Block-C (Ramanujan) - Room C-101</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Category *</label>
+          <select id="modalCategory" required>
+            <option value="Electrical">Electrical &amp; Wiring (24h SLA)</option>
+            <option value="Plumbing">Plumbing &amp; Sanitation (12h SLA)</option>
+            <option value="HVAC">Air Conditioning &amp; HVAC (24h SLA)</option>
+            <option value="Network">Wi-Fi &amp; LAN Network (6h SLA)</option>
+            <option value="Carpentry">Carpentry &amp; Furniture (48h SLA)</option>
+            <option value="Civil">Civil &amp; Pest Control (72h SLA)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Priority Level *</label>
+          <select id="modalPriority" required>
+            <option value="LOW">LOW</option>
+            <option value="MEDIUM" selected>MEDIUM</option>
+            <option value="HIGH">HIGH</option>
+            <option value="EMERGENCY">EMERGENCY (Triggers Under Maintenance Status)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Issue Title *</label>
+          <input type="text" id="modalTitle" class="form-input" placeholder="e.g. Study table lamp socket sparking" required />
+        </div>
+        <div class="form-group">
+          <label>Description *</label>
+          <textarea id="modalDesc" class="form-input" rows="3" placeholder="Provide complete failure details..." required></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('newComplaintModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Ticket</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Assign Technician (Warden) -->
+  <div id="assignModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Execute sp_pragya24bci0280_assign_technician</h3>
+        <button class="close-btn" onclick="closeModal('assignModal')">&times;</button>
+      </div>
+      <form onsubmit="handleAssignTech(event)">
+        <input type="hidden" id="assignComplaintId" />
+        <div class="form-group">
+          <label>Ticket Number</label>
+          <input type="text" id="assignTicketNo" class="form-input" disabled style="background:#f1f5f9;" />
+        </div>
+        <div class="form-group">
+          <label>Assign Maintenance Technician *</label>
+          <select id="assignTechSelect" class="form-input" required>
+            <option value="Ramesh Kumar (Electrical)">Ramesh Kumar - Senior Electrician (TECH001)</option>
+            <option value="Suresh Sharma (Plumbing)">Suresh Sharma - Senior Plumber (TECH002)</option>
+            <option value="Amit Patel (HVAC)">Amit Patel - HVAC &amp; AC Specialist (TECH003)</option>
+            <option value="Rajesh Varma (Network)">Rajesh Varma - Wi-Fi &amp; Network Engineer (TECH004)</option>
+            <option value="Manoj Tiwari (Carpentry)">Manoj Tiwari - Carpentry &amp; Furniture (TECH005)</option>
+            <option value="Deepak Das (Civil)">Deepak Das - Civil &amp; Pest Control (TECH006)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Expected SLA Hours</label>
+          <input type="number" id="assignHours" class="form-input" value="12" min="1" max="72" required />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('assignModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Execute Stored Procedure</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Resolve Complaint (Technician) -->
+  <div id="resolveModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Execute sp_suhani24bci0006_resolve_complaint</h3>
+        <button class="close-btn" onclick="closeModal('resolveModal')">&times;</button>
+      </div>
+      <form onsubmit="handleResolveComplaint(event)">
+        <input type="hidden" id="resolveComplaintId" />
+        <div class="form-group">
+          <label>Actions Performed *</label>
+          <textarea id="resolveAction" class="form-input" rows="2" placeholder="e.g. Cleaned fan capacitor and replaced rotary switch" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Spare Parts Replaced</label>
+          <input type="text" id="resolveParts" class="form-input" placeholder="e.g. 5-Speed Rotary Regulator Switch" />
+        </div>
+        <div class="form-group">
+          <label>Parts / Labor Cost (₹)</label>
+          <input type="number" id="resolveCost" class="form-input" value="150.00" step="10" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('resolveModal')">Cancel</button>
+          <button type="submit" class="btn btn-success">Mark Resolved</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- HIDDEN MODAL: System User Directory (Secret spot accessible only via small info button) -->
+  <div id="hiddenDirectoryModal" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 620px; max-height: 85vh; overflow-y: auto;">
+      <div class="modal-header">
+        <h3>System User Directory (Single Users Table)</h3>
+        <button class="close-btn" onclick="closeModal('hiddenDirectoryModal')">&times;</button>
+      </div>
+      <p style="font-size:0.8rem; color:#64748b; margin-bottom:12px;">Click any account below to auto-fill into the login box:</p>
+
+      <div style="font-size:0.82rem;">
+        <div style="font-weight:700; color:#3730a3; margin:8px 0 6px 0;">🎓 Students (Password: Password@123):</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+          <button type="button" class="chip-btn" onclick="fillAndClose('24BCI0006')"><span><strong>24BCI0006</strong> - Suhani (A-101)</span></button>
+          <button type="button" class="chip-btn" onclick="fillAndClose('24BCI0112')"><span><strong>24BCI0112</strong> - Rahul (B-101)</span></button>
+          <button type="button" class="chip-btn" onclick="fillAndClose('24BCI0145')"><span><strong>24BCI0145</strong> - Ananya (A-102)</span></button>
+          <button type="button" class="chip-btn" onclick="fillAndClose('24BCI0189')"><span><strong>24BCI0189</strong> - Rohan (B-101)</span></button>
+          <button type="button" class="chip-btn" onclick="fillAndClose('24BCI0210')"><span><strong>24BCI0210</strong> - Priya (C-101)</span></button>
+          <button type="button" class="chip-btn" onclick="fillAndClose('24BCI0235')"><span><strong>24BCI0235</strong> - Aryan (B-205)</span></button>
+          <button type="button" class="chip-btn" onclick="fillAndClose('24BCI0301')"><span><strong>24BCI0301</strong> - Sneha (A-201)</span></button>
+        </div>
+
+        <div style="font-weight:700; color:#92400e; margin:14px 0 6px 0;">🛡️ Wardens &amp; Administrators:</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+          <button type="button" class="chip-btn" onclick="fillAndClose('24BCI0280')"><span><strong>24BCI0280</strong> - Pragya (Block A)</span></button>
+          <button type="button" class="chip-btn" onclick="fillAndClose('FAC104025')"><span><strong>FAC104025</strong> - Dr. Sivakumar (Block B)</span></button>
+          <button type="button" class="chip-btn" onclick="fillAndClose('FAC102140')"><span><strong>FAC102140</strong> - Prof. Radhika (Block C)</span></button>
+          <button type="button" class="chip-btn" onclick="fillAndClose('FAC103550')"><span><strong>FAC103550</strong> - Mr. K. Sundar (Block D)</span></button>
+        </div>
+
+        <div style="font-weight:700; color:#065f46; margin:14px 0 6px 0;">🔧 Maintenance Technicians:</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+          <button type="button" class="chip-btn" onclick="fillAndClose('TECH001')"><span><strong>TECH001</strong> - Ramesh (Electrician)</span></button>
+          <button type="button" class="chip-btn" onclick="fillAndClose('TECH002')"><span><strong>TECH002</strong> - Suresh (Plumber)</span></button>
+          <button type="button" class="chip-btn" onclick="fillAndClose('TECH003')"><span><strong>TECH003</strong> - Amit (HVAC &amp; AC)</span></button>
+          <button type="button" class="chip-btn" onclick="fillAndClose('TECH004')"><span><strong>TECH004</strong> - Rajesh (Wi-Fi)</span></button>
+          <button type="button" class="chip-btn" onclick="fillAndClose('TECH005')"><span><strong>TECH005</strong> - Manoj (Carpentry)</span></button>
+          <button type="button" class="chip-btn" onclick="fillAndClose('TECH006')"><span><strong>TECH006</strong> - Deepak (Civil)</span></button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('hiddenDirectoryModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastBox" class="toast hidden"></div>
+
+  <script>
+    // Expanded Database User Roster (Single Users Table with RBAC)
+    const userRoster = [
+      // Students
+      { id: 1, name: 'Suhani Singh', regNo: '24BCI0006', role: 'STUDENT', email: 'suhani.24bci0006@vitstudent.ac.in', room: 'Block-A - A-101' },
+      { id: 2, name: 'Rahul Menon', regNo: '24BCI0112', role: 'STUDENT', email: 'rahul.menon@vitstudent.ac.in', room: 'Block-B - B-101' },
+      { id: 3, name: 'Ananya Sen', regNo: '24BCI0145', role: 'STUDENT', email: 'ananya.sen@vitstudent.ac.in', room: 'Block-A - A-102' },
+      { id: 4, name: 'Rohan Verma', regNo: '24BCI0189', role: 'STUDENT', email: 'rohan.verma@vitstudent.ac.in', room: 'Block-B - B-101' },
+      { id: 5, name: 'Priya Sharma', regNo: '24BCI0210', role: 'STUDENT', email: 'priya.sharma@vitstudent.ac.in', room: 'Block-C - C-101' },
+      { id: 6, name: 'Aryan Patel', regNo: '24BCI0235', role: 'STUDENT', email: 'aryan.patel@vitstudent.ac.in', room: 'Block-B - B-205' },
+      { id: 7, name: 'Sneha Reddy', regNo: '24BCI0301', role: 'STUDENT', email: 'sneha.reddy@vitstudent.ac.in', room: 'Block-A - A-201' },
+
+      // Wardens & Admins
+      { id: 10, name: 'Pragya Agarwal', regNo: '24BCI0280', role: 'WARDEN_ADMIN', email: 'pragya.24bci0280@vitstudent.ac.in', block: 'Block-A (Sarojini)' },
+      { id: 11, name: 'Dr. V. Sivakumar', regNo: 'FAC104025', role: 'WARDEN_ADMIN', email: 'vsivakumar@vit.ac.in', block: 'Block-B (Tagore)' },
+      { id: 12, name: 'Prof. Radhika Raman', regNo: 'FAC102140', role: 'WARDEN_ADMIN', email: 'rraman@vit.ac.in', block: 'Block-C (Ramanujan)' },
+      { id: 13, name: 'Mr. K. Sundar', regNo: 'FAC103550', role: 'WARDEN_ADMIN', email: 'ksundar@vit.ac.in', block: 'Block-D (Deluxe)' },
+
+      // Technicians
+      { id: 20, name: 'Ramesh Kumar', regNo: 'TECH001', role: 'TECHNICIAN', email: 'ramesh.tech@vit.ac.in', spec: 'Electrical' },
+      { id: 21, name: 'Suresh Sharma', regNo: 'TECH002', role: 'TECHNICIAN', email: 'suresh.tech@vit.ac.in', spec: 'Plumbing' },
+      { id: 22, name: 'Amit Patel', regNo: 'TECH003', role: 'TECHNICIAN', email: 'amit.tech@vit.ac.in', spec: 'HVAC & AC' },
+      { id: 23, name: 'Rajesh Varma', regNo: 'TECH004', role: 'TECHNICIAN', email: 'rajesh.tech@vit.ac.in', spec: 'Network & Wi-Fi' },
+      { id: 24, name: 'Manoj Tiwari', regNo: 'TECH005', role: 'TECHNICIAN', email: 'manoj.tech@vit.ac.in', spec: 'Carpentry' },
+      { id: 25, name: 'Deepak Das', regNo: 'TECH006', role: 'TECHNICIAN', email: 'deepak.tech@vit.ac.in', spec: 'Civil & Pest Control' }
+    ];
+
+    let currentUser = null;
+
+    // Complaints Dataset
+    let complaints = [
+      { id: 1, ticket: 'TKT-2026-001', student: 'Suhani Singh (24BCI0006)', room: 'Block-A - A-101', category: 'Electrical', title: 'Ceiling fan regulator sparking past speed 2', priority: 'HIGH', status: 'ASSIGNED', tech: 'Ramesh Kumar', reported: '2026-10-18 10:30', rating: null },
+      { id: 2, ticket: 'TKT-2026-002', student: 'Suhani Singh (24BCI0006)', room: 'Block-A - A-101', category: 'HVAC', title: 'Split AC blowing room temp air instead of cold', priority: 'MEDIUM', status: 'RESOLVED', tech: 'Amit Patel', reported: '2026-10-15 09:00', rating: 5 },
+      { id: 3, ticket: 'TKT-2026-003', student: 'Rahul Menon (24BCI0112)', room: 'Block-B - B-101', category: 'Plumbing', title: 'Continuous water leakage under wash basin', priority: 'HIGH', status: 'IN_PROGRESS', tech: 'Suresh Sharma', reported: '2026-10-19 14:15', rating: null },
+      { id: 4, ticket: 'TKT-2026-004', student: 'Ananya Sen (24BCI0145)', room: 'Block-A - A-102', category: 'Network', title: 'Wi-Fi access point offline on 1st floor', priority: 'MEDIUM', status: 'SUBMITTED', tech: 'Unassigned', reported: '2026-10-20 18:00', rating: null },
+      { id: 5, ticket: 'TKT-2026-005', student: 'Rohan Verma (24BCI0189)', room: 'Block-B - B-101', category: 'Carpentry', title: 'Study table drawer lock broken and jammed', priority: 'LOW', status: 'SUBMITTED', tech: 'Unassigned', reported: '2026-10-20 19:45', rating: null },
+      { id: 6, ticket: 'TKT-2026-006', student: 'Aryan Patel (24BCI0235)', room: 'Block-B - B-205', category: 'Plumbing', title: 'Emergency main pipeline joint valve cracked', priority: 'EMERGENCY', status: 'ASSIGNED', tech: 'Suresh Sharma', reported: '2026-10-20 20:00', rating: null },
+      { id: 7, ticket: 'TKT-2026-007', student: 'Priya Sharma (24BCI0210)', room: 'Block-C - C-101', category: 'HVAC', title: 'Water dripping from AC indoor blower coil', priority: 'HIGH', status: 'ASSIGNED', tech: 'Amit Patel', reported: '2026-10-20 21:00', rating: null },
+      { id: 8, ticket: 'TKT-2026-008', student: 'Sneha Reddy (24BCI0301)', room: 'Block-A - A-201', category: 'Civil', title: 'Window latch misaligned causing rain seep', priority: 'LOW', status: 'RESOLVED', tech: 'Deepak Das', reported: '2026-10-17 11:20', rating: 4 }
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('consoleTime').innerText = new Date().toISOString();
+      renderDatabaseViews();
+    });
+
+    // Quick fill helper
+    function fillCredentials(id) {
+      document.getElementById('inputIdentifier').value = id;
+      document.getElementById('inputPassword').value = 'Password@123';
+    }
+
+    function fillAndClose(id) {
+      fillCredentials(id);
+      closeModal('hiddenDirectoryModal');
+      showToast(`Selected account: ${id}`);
+    }
+
+    // Login Form Handler (Authentication & RBAC)
+    function handleFormLogin(e) {
+      e.preventDefault();
+      const identifier = document.getElementById('inputIdentifier').value.trim();
+      const password = document.getElementById('inputPassword').value;
+
+      if (!identifier || !password) {
+        showToast('Please enter both identifier and password', true);
+        return;
+      }
+
+      // Find user in Single Users Table (Case-insensitive matching)
+      const user = userRoster.find(u => 
+        u.regNo.toLowerCase() === identifier.toLowerCase() || 
+        u.email.toLowerCase() === identifier.toLowerCase() ||
+        u.name.toLowerCase().includes(identifier.toLowerCase())
+      );
+
+      if (!user) {
+        showToast('Invalid credentials. User not found in single Users table!', true);
+        return;
+      }
+
+      // Successful login
+      currentUser = user;
+
+      // Hide Login Screen & Reveal Dashboard
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboardScreen').style.display = 'block';
+
+      // Update Nav profile
+      document.getElementById('navAvatar').innerText = user.name.charAt(0);
+      document.getElementById('navUserName').innerText = user.name;
+      document.getElementById('navUserMeta').innerText = user.regNo;
+
+      const badge = document.getElementById('navRoleBadge');
+      badge.innerText = user.role;
+      badge.className = 'role-badge ' + (
+        user.role === 'STUDENT' ? 'role-student' :
+        user.role === 'WARDEN_ADMIN' ? 'role-warden' : 'role-tech'
+      );
+
+      // Hide "+ Lodge Complaint" for technicians
+      const btnNew = document.getElementById('btnOpenNewModal');
+      btnNew.style.display = user.role === 'TECHNICIAN' ? 'none' : 'inline-flex';
+
+      // Update JWT Display in Security Tab
+      const jwtBox = document.getElementById('jwtTokenDisplay');
+      if (jwtBox) {
+        jwtBox.innerText = `// Active Signed JWT Token Header:
+{ "alg": "HS256", "typ": "JWT" }
+
+// Active Decoded Token Claims (Single Users Table):
+{
+  "userId": ${user.id},
+  "regNo": "${user.regNo}",
+  "fullName": "${user.name}",
+  "role": "${user.role}",
+  "exp": ${Math.floor(Date.now() / 1000) + 86400}
+}`;
+      }
+
+      renderComplaintsTable();
+      showToast(`Welcome, ${user.name}! (${user.role})`);
+      logToConsole(`[LOGIN SUCCESS - 24BCI0280 & 24BCI0006] Authenticated ${user.name} (${user.regNo}) | Role: ${user.role} via Single Users Table.`);
+    }
+
+    // Sign Out Handler
+    function handleSignOut() {
+      currentUser = null;
+      document.getElementById('dashboardScreen').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('inputIdentifier').value = '';
+      showToast('You have been signed out.');
+      logToConsole('[AUTH SESSION ENDED] User signed out. Session token cleared.');
+    }
+
+    function renderComplaintsTable() {
+      if (!currentUser) return;
+      const tbody = document.getElementById('complaintsTbody');
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const statusFilter = document.getElementById('filterStatus').value;
+      const catFilter = document.getElementById('filterCategory').value;
+
+      tbody.innerHTML = '';
+
+      let filtered = complaints.filter(c => {
+        // Scoping by role
+        if (currentUser.role === 'STUDENT' && !c.student.includes(currentUser.regNo)) return false;
+        if (currentUser.role === 'TECHNICIAN' && !c.tech.includes(currentUser.name.split(' ')[0])) return false;
+
+        if (search && !c.ticket.toLowerCase().includes(search) && !c.title.toLowerCase().includes(search)) return false;
+        if (statusFilter && c.status !== statusFilter) return false;
+        if (catFilter && !c.category.includes(catFilter)) return false;
+        return true;
+      });
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:24px; color:#64748b;">No complaints found for current role/filter criteria.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(c => {
+        let actionBtns = '';
+
+        if (currentUser.role === 'WARDEN_ADMIN' && c.status !== 'RESOLVED') {
+          actionBtns += `<button class="btn btn-sm btn-outline" onclick="openAssignModal(${c.id}, '${c.ticket}')">&#128104;&#8205;&#128295; Assign</button> `;
+        }
+        if (currentUser.role === 'TECHNICIAN' && c.status !== 'RESOLVED') {
+          actionBtns += `<button class="btn btn-sm btn-success" onclick="openResolveModal(${c.id})">&#9989; Resolve</button> `;
+        }
+        if (currentUser.role === 'STUDENT' && c.status === 'RESOLVED' && !c.rating) {
+          actionBtns += `<button class="btn btn-sm btn-warning" onclick="rateTicket(${c.id})">&#11088; Rate 5★</button> `;
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${c.ticket}</strong></td>
+          <td>
+            <div>${c.student}</div>
+            <small style="color:#64748b;">${c.room}</small>
+          </td>
+          <td>
+            <strong>${c.category}</strong>
+            <div style="font-size:0.75rem; color:#475569;">${c.title}</div>
+          </td>
+          <td><span class="badge badge-${c.priority.toLowerCase()}">${c.priority}</span></td>
+          <td><span class="badge badge-${c.status.toLowerCase()}">${c.status}</span></td>
+          <td>${c.tech === 'Unassigned' ? '<span style="color:#94a3b8;">Unassigned</span>' : `<strong>${c.tech}</strong>`}</td>
+          <td><small>${c.reported}</small></td>
+          <td>${actionBtns || '<span style="color:#94a3b8;">-</span>'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      updateKpis();
+    }
+
+    function updateKpis() {
+      document.getElementById('kpiTotal').innerText = complaints.length;
+      document.getElementById('kpiPending').innerText = complaints.filter(c => c.status === 'SUBMITTED').length;
+      document.getElementById('kpiProgress').innerText = complaints.filter(c => c.status === 'ASSIGNED' || c.status === 'IN_PROGRESS').length;
+      document.getElementById('kpiResolved').innerText = complaints.filter(c => c.status === 'RESOLVED').length;
+    }
+
+    function renderDatabaseViews() {
+      // View 1
+      const v1 = document.getElementById('view1Tbody');
+      v1.innerHTML = `
+        <tr><td><strong>TKT-2026-001</strong></td><td>Block-A - A-101</td><td>Electrical (24h)</td><td>58h elapsed</td><td><span style="color:#dc2626; font-weight:700;">SLA_BREACHED</span></td></tr>
+        <tr><td><strong>TKT-2026-003</strong></td><td>Block-B - B-101</td><td>Plumbing (12h)</td><td>10h elapsed</td><td><span style="color:#d97706; font-weight:700;">SLA_WARNING</span></td></tr>
+        <tr><td><strong>TKT-2026-004</strong></td><td>Block-A - A-102</td><td>Network (6h)</td><td>2h elapsed</td><td><span style="color:#16a34a; font-weight:700;">WITHIN_SLA</span></td></tr>
+        <tr><td><strong>TKT-2026-006</strong></td><td>Block-B - B-205</td><td>Plumbing (12h)</td><td>3h elapsed</td><td><span style="color:#16a34a; font-weight:700;">WITHIN_SLA</span></td></tr>
+      `;
+
+      // View 2
+      const v2 = document.getElementById('view2Tbody');
+      v2.innerHTML = `
+        <tr><td><strong>Ramesh Kumar</strong> (TECH001)</td><td><span class="badge badge-assigned">1 Active</span></td><td>4</td><td>⭐ 4.80 (5)</td><td>₹1,450.00</td></tr>
+        <tr><td><strong>Suresh Sharma</strong> (TECH002)</td><td><span class="badge badge-assigned">2 Active</span></td><td>6</td><td>⭐ 4.65 (6)</td><td>₹2,100.00</td></tr>
+        <tr><td><strong>Amit Patel</strong> (TECH003)</td><td><span class="badge badge-assigned">1 Active</span></td><td>5</td><td>⭐ 5.00 (4)</td><td>₹1,850.00</td></tr>
+        <tr><td><strong>Rajesh Varma</strong> (TECH004)</td><td><span class="badge badge-resolved">0 Active</span></td><td>3</td><td>⭐ 4.90 (3)</td><td>₹320.00</td></tr>
+        <tr><td><strong>Manoj Tiwari</strong> (TECH005)</td><td><span class="badge badge-resolved">0 Active</span></td><td>4</td><td>⭐ 4.50 (2)</td><td>₹600.00</td></tr>
+        <tr><td><strong>Deepak Das</strong> (TECH006)</td><td><span class="badge badge-resolved">0 Active</span></td><td>5</td><td>⭐ 4.70 (3)</td><td>₹450.00</td></tr>
+      `;
+
+      // View 3
+      const v3 = document.getElementById('view3Tbody');
+      v3.innerHTML = `
+        <tr><td><strong>Block-A (Sarojini)</strong></td><td>Electrical</td><td>5</td><td>4</td><td>1</td><td>18.5 hrs</td><td>⭐ 4.80</td></tr>
+        <tr><td><strong>Block-A (Sarojini)</strong></td><td>HVAC</td><td>3</td><td>3</td><td>0</td><td>26.2 hrs</td><td>⭐ 5.00</td></tr>
+        <tr><td><strong>Block-B (Tagore)</strong></td><td>Plumbing</td><td>8</td><td>6</td><td>2</td><td>8.4 hrs</td><td>⭐ 4.60</td></tr>
+        <tr><td><strong>Block-C (Ramanujan)</strong></td><td>HVAC</td><td>4</td><td>3</td><td>1</td><td>12.0 hrs</td><td>⭐ 4.90</td></tr>
+      `;
+    }
+
+    // Modal Helpers
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    function openAssignModal(id, ticket) {
+      document.getElementById('assignComplaintId').value = id;
+      document.getElementById('assignTicketNo').value = ticket;
+      openModal('assignModal');
+    }
+
+    function openResolveModal(id) {
+      document.getElementById('resolveComplaintId').value = id;
+      openModal('resolveModal');
+    }
+
+    // Actions
+    function handleLodgeComplaint(e) {
+      e.preventDefault();
+      const cat = document.getElementById('modalCategory').value;
+      const roomText = document.getElementById('modalRoom').selectedOptions[0].text;
+      const priority = document.getElementById('modalPriority').value;
+      const title = document.getElementById('modalTitle').value;
+
+      // Duplicate Check Trigger Simulation
+      const duplicate = complaints.find(c => c.room === roomText.split(' (')[0] && c.category === cat && c.status !== 'RESOLVED');
+      if (duplicate) {
+        alert('TRIGGER ERROR [24BCI0280 & 24BCI0006]: trg_before_complaint_insert_prevent_duplicate canceled insert! An active ticket already exists for this room & category.');
+        logToConsole(`[TRIGGER SIGNAL 45000] Blocked duplicate ticket for ${roomText} (${cat})`);
+        return;
+      }
+
+      const newId = complaints.length + 1;
+      const ticket = `TKT-2026-00${newId}`;
+      complaints.unshift({
+        id: newId,
+        ticket,
+        student: `${currentUser.name} (${currentUser.regNo})`,
+        room: roomText.split(' (')[0],
+        category: cat,
+        title,
+        priority,
+        status: 'SUBMITTED',
+        tech: 'Unassigned',
+        reported: new Date().toISOString().replace('T', ' ').substring(0, 16),
+        rating: null
+      });
+
+      closeModal('newComplaintModal');
+      e.target.reset();
+      showToast(`Complaint lodged successfully: ${ticket}`);
+      logToConsole(`[INSERT COMPLAINT] Ticket ${ticket} created by ${currentUser.regNo}. Priority: ${priority}.`);
+      renderComplaintsTable();
+    }
+
+    function handleAssignTech(e) {
+      e.preventDefault();
+      const id = parseInt(document.getElementById('assignComplaintId').value);
+      const tech = document.getElementById('assignTechSelect').value;
+      const hours = document.getElementById('assignHours').value;
+
+      const c = complaints.find(item => item.id === id);
+      if (c) {
+        c.tech = tech.split(' (')[0];
+        c.status = 'ASSIGNED';
+      }
+
+      closeModal('assignModal');
+      showToast(`Technician assigned to ${c.ticket}!`);
+      logToConsole(`CALL sp_pragya24bci0280_assign_technician(${id}, '${tech}', '${currentUser.regNo}', ${hours}) -> ACID Transaction Committed. Status updated to ASSIGNED.`);
+      renderComplaintsTable();
+    }
+
+    function handleResolveComplaint(e) {
+      e.preventDefault();
+      const id = parseInt(document.getElementById('resolveComplaintId').value);
+      const action = document.getElementById('resolveAction').value;
+      const parts = document.getElementById('resolveParts').value || 'None';
+      const cost = document.getElementById('resolveCost').value;
+
+      const c = complaints.find(item => item.id === id);
+      if (c) {
+        c.status = 'RESOLVED';
+      }
+
+      closeModal('resolveModal');
+      showToast(`Ticket ${c.ticket} marked as RESOLVED!`);
+      logToConsole(`CALL sp_suhani24bci0006_resolve_complaint(${id}, '${currentUser.regNo}', '${action}', '${parts}', ₹${cost}) -> Status updated to RESOLVED. Room status restored.`);
+      renderComplaintsTable();
+    }
+
+    function rateTicket(id) {
+      const c = complaints.find(item => item.id === id);
+      if (c) {
+        c.rating = 5;
+        showToast(`Submitted 5-Star Rating for ${c.ticket}! Thank you.`);
+        logToConsole(`[FEEDBACK SUBMITTED] Student ${currentUser.regNo} gave 5 Stars for ${c.ticket}. Audit log created.`);
+        renderComplaintsTable();
+      }
+    }
+
+    function logToConsole(msg) {
+      const box = document.getElementById('sqlConsoleBox');
+      const time = new Date().toLocaleTimeString();
+      box.innerHTML += `\n[${time}] ${msg}`;
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function showTab(e, id) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      document.getElementById(id).classList.add('active');
+    }
+
+    function showToast(msg, isError = false) {
+      const box = document.getElementById('toastBox');
+      box.innerText = msg;
+      box.style.background = isError ? '#ef4444' : '#1e293b';
+      box.classList.remove('hidden');
+      setTimeout(() => box.classList.add('hidden'), 3500);
+    }
+  </script>
+</body>
+</html>

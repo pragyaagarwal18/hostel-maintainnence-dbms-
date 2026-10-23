@@ -1,0 +1,53 @@
+version: '3.8'
+
+# ============================================================================
+# Docker Compose for Multi-Container Deployment (Node.js App + MySQL 8.0)
+# Authors: Pragya Agarwal (24BCI0280) & Suhani Singh (24BCI0006)
+# ============================================================================
+
+services:
+  # MySQL Relational Database Service
+  mysql_db:
+    image: mysql:8.0
+    container_name: hostel_mysql_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: hostel_maintenance_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/01_schema_ddl.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./database/02_views.sql:/docker-entrypoint-initdb.d/02_views.sql
+      - ./database/03_triggers.sql:/docker-entrypoint-initdb.d/03_triggers.sql
+      - ./database/04_stored_procedures.sql:/docker-entrypoint-initdb.d/04_procedures.sql
+      - ./database/05_seed_data.sql:/docker-entrypoint-initdb.d/05_seed.sql
+    networks:
+      - hostel_network
+
+  # Full-Stack Application Service (Node.js + Express + Prisma)
+  app:
+    build: .
+    container_name: hostel_app_container
+    restart: always
+    depends_on:
+      - mysql_db
+    environment:
+      PORT: 5000
+      NODE_ENV: production
+      DATABASE_URL: "mysql://root:rootpassword@mysql_db:3306/hostel_maintenance_db"
+      JWT_SECRET: "pragya_24bci0280_suhani_24bci0006_jwt_secret_key_2026_super_secure"
+      JWT_EXPIRES_IN: "24h"
+    ports:
+      - "5000:5000"
+    networks:
+      - hostel_network
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  hostel_network:
+    driver: bridge
